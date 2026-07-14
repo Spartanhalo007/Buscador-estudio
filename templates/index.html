@@ -1,0 +1,129 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <title>Study Resources Finder</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
+  </head>
+  <body>
+    <header>
+      <h1>Study Resources Finder</h1>
+      <p>
+        Type a topic (for example: <strong>cloud computing</strong>, <strong>python</strong>)
+        and we will show books, videos and a reference map.
+      </p>
+    </header>
+
+    <main>
+      <!-- Search form section -->
+      <section class="search">
+        <form method="post">
+          <input
+            type="text"
+            name="query"
+            placeholder="Topic to search..."
+            value="{{ query }}"
+            required
+          />
+          <button type="submit">Search</button>
+        </form>
+
+        {% if error %}
+        <p class="error">{{ error }}</p>
+        {% endif %}
+      </section>
+
+      <!-- Results section: two columns (Books / Videos) -->
+      <section class="results">
+        <!-- Column for Google Books results -->
+        <div class="column">
+          <h2>Books (Google Books)</h2>
+          {% if books %}
+          <ul class="list">
+            {% for book in books %}
+            <li class="item">
+              {% if book.thumbnail %}
+              <img src="{{ book.thumbnail }}" alt="Book cover" />
+              {% endif %}
+              <div>
+                <h3>{{ book.title }}</h3>
+                {% if book.authors %}
+                <p><strong>Authors:</strong> {{ book.authors }}</p>
+                {% endif %}
+                <p>{{ book.description }}</p>
+                <a href="{{ book.link }}" target="_blank" rel="noopener noreferrer">
+                  More details
+                </a>
+              </div>
+            </li>
+            {% endfor %}
+          </ul>
+          {% elif query %}
+          <p>No books found.</p>
+          {% endif %}
+        </div>
+
+        <!-- Column for YouTube videos results -->
+        <div class="column">
+          <h2>Videos (YouTube)</h2>
+          {% if videos %}
+          <ul class="list">
+            {% for video in videos %}
+            <li class="item">
+              {% if video.thumbnail %}
+              <img src="{{ video.thumbnail }}" alt="Video thumbnail" />
+              {% endif %}
+              <div>
+                <h3>{{ video.title }}</h3>
+                <p><strong>Channel:</strong> {{ video.channel }}</p>
+                <p>{{ video.description }}</p>
+                <a href="{{ video.video_url }}" target="_blank" rel="noopener noreferrer">
+                  Watch on YouTube
+                </a>
+              </div>
+            </li>
+            {% endfor %}
+          </ul>
+          {% elif query %}
+          <p>No videos found.</p>
+          {% endif %}
+        </div>
+      </section>
+
+      <!-- Map section: third API (Google Maps JavaScript API) -->
+      <section class="map-section">
+        <h2>Reference Map (Google Maps)</h2>
+        <p>
+          Simple map centered on Cali, Colombia. In your video you can explain that this uses
+          the Google Maps JavaScript API to render the map and marker.
+        </p>
+        <div id="map"></div>
+      </section>
+    </main>
+
+    <script>
+      // Initialize Google Map centered on a fixed location (Cali, Colombia)
+      function initMap() {
+        const center = { lat: 3.4516, lng: -76.532 };
+
+        const map = new google.maps.Map(document.getElementById("map"), {
+          zoom: 6,
+          center: center,
+        });
+
+        new google.maps.Marker({
+          position: center,
+          map: map,
+          title: "Cali, Colombia",
+        });
+      }
+    </script>
+
+    <!-- Load Google Maps JavaScript API with your key and the callback function -->
+    <script
+      async
+      defer
+      src="https://maps.googleapis.com/maps/api/js?key={{ google_maps_api_key }}&callback=initMap"
+    ></script>
+  </body>
+</html>
