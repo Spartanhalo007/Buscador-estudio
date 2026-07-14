@@ -3,19 +3,13 @@ import requests
 from flask import Flask, render_template, request
 from dotenv import load_dotenv
 
-print("CWD:", os.getcwd())  # current working directory
-print("ENV BEFORE load_dotenv:", os.getenv("GOOGLE_API_KEY"))
-
 # Load environment variables from the .env file
 load_dotenv()
-
-print("ENV AFTER load_dotenv:", os.getenv("GOOGLE_API_KEY"))
 
 app = Flask(__name__)
 
 # Read the API key from the environment (.env file)
 GOOGLE_API_KEY = os.getenv("GOOGLE_API_KEY")
-print("DEBUG GOOGLE_API_KEY:", GOOGLE_API_KEY)
 
 def search_books(query, max_results=5):
     """
@@ -30,12 +24,12 @@ def search_books(query, max_results=5):
         "q": query,
         "maxResults": max_results,
         "key": GOOGLE_API_KEY,
+        "country": "CO"
     }
 
     try:
         response = requests.get(url, params=params, timeout=5)
         print("DEBUG Books status:", response.status_code)
-        print("DEBUG Books body:", response.text[:500])  # debugg
         response.raise_for_status()
         data = response.json()
 
@@ -57,9 +51,7 @@ def search_books(query, max_results=5):
             )
 
         return books
-    except Exception as e: # except Exception
-        # On error, return an empty list to keep the UI working
-        print("ERROR in search_books:", e) #debugg
+    except Exception:
         return []
 
 
@@ -83,7 +75,6 @@ def search_videos(query, max_results=5):
     try:
         response = requests.get(url, params=params, timeout=5)
         print("DEBUG YouTube status:", response.status_code)
-        print("DEBUG YouTube body:", response.text[:500]) # debugg
         response.raise_for_status()
         data = response.json()
 
@@ -112,8 +103,7 @@ def search_videos(query, max_results=5):
             )
 
         return videos
-    except Exception as e: #except Exception
-        print("ERROR in search_videos:", e) # debugg
+    except Exception:
         return []
 
 
